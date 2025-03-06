@@ -7,6 +7,7 @@ const {
   updateUserProfile,
 } = require("../controllers/authController");
 const { protect, admin } = require("../middleware/authMiddleware");
+const User = require("../models/User");
 
 const router = express.Router();
 
@@ -26,12 +27,13 @@ router.get("/profile", protect, getUserProfile);
 router.put("/profile", protect, updateUserProfile);
 
 // ✅ Get all users (Admin only)
-router.get("/users", protect, admin, async (req, res) => {
+router.get("/", protect, admin, async (req, res) => {
   try {
     const users = await User.find().select("-password");
-    res.json(users);
+    res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("❌ Error fetching users:", error.message);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
